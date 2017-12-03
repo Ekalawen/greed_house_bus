@@ -13,7 +13,7 @@
 	#define POS_INI_BUS_Y					2880
 	#define VITESSE_LINEAIRE_BUS			1*20
 	#define VITESSE_ROTATION_BUS			PI/180*4
-	#define CENTRE_ROTATION_PONDERATION		1.0		// compris entre 0 et 1 (0 avant, 1.0/2.0 centre, 1 arrière)
+	#define CENTRE_ROTATION_PONDERATION		0.9		// compris entre 0 et 1 (0 avant, 1.0/2.0 centre, 1 arrière)
 	#define LARGEUR_BUS						80
 	#define LONGEUR_BUS						240
 	#define NB_MAX_PASSAGERS				100

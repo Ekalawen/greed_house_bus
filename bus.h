@@ -36,6 +36,10 @@ int avancerBus(Map *m, Bus *bus, double avancee) ;
  * Renvoie true si la rotation s'est effectuée, false sinon. */
 int rotationBus(Map *m, Bus *bus, double rotation) ;
 
+/* Fait effectuer une rotation au bus mais par rapport à son AUTRE
+ * centre de rotation ! */
+int rotationBusAvant(Map *m, Bus *bus, double rotation) ;
+
 /* Affiche un bus à sa position actuelle sur la carte */
 void afficherBus(SDL_Surface *ecran, Map *m, Bus *bus) ;
 

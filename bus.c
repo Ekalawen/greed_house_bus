@@ -50,16 +50,34 @@ int deplacerBus(Map *m, Bus* bus, double avancee, double rotation) {
 	double nv_pas ;
 	double mv_x, mv_y ;
 	double tmp_rot ;
+	bool aTournee;
 	// rotation fullmouvement
 	if(!rotationBus(m, bus, rotation)) {
 		// si pas possible, faire la rotation la plus ample possible
 		i = PI / 180 ; // i est échantilloné en degrés
 		nv_pas = rotation - signe(rotation)*i ;
-		while(signe(nv_pas) * signe(rotation) > 0 && !rotationBus(m, bus, nv_pas)) {
+		aTournee = false;
+		while(signe(nv_pas) * signe(rotation) > 0 && !(aTournee = rotationBus(m, bus, nv_pas))) {
 			i += PI / 180 ;
 			nv_pas = rotation - signe(rotation)*i ;
 		}
+
+		// Si on a pas réussi du tout à tourner autour du premier centre de rotation
+		if(!aTournee) {
+			// Alors on essaye avec un autre centre de rotation ! <3
+			if(!rotationBusAvant(m, bus, rotation)) {
+				// si pas possible, faire la rotation la plus ample possible
+				i = PI / 180 ; // i est échantilloné en degrés
+				nv_pas = rotation - signe(rotation)*i ;
+				aTournee = false;
+				while(signe(nv_pas) * signe(rotation) > 0 && !(aTournee = rotationBusAvant(m, bus, nv_pas))) {
+					i += PI / 180 ;
+					nv_pas = rotation - signe(rotation)*i ;
+				}
+			}
+		}
 	}
+
 	// avancée fullmouvement
 	if(!avancerBus(m, bus, avancee)) {
 		// si pas possible, décomposer le mouvement sur chacun des 2 axes
@@ -173,6 +191,59 @@ int rotationBus(Map *m, Bus *bus, double rotation) {
 	}
 }
 
+int rotationBusAvant(Map *m, Bus *bus, double rotation) {
+	int i ;
+	double collision = false ; // au début, le bus n'est pas en collision
+	double coef_avant, coef_arriere ;
+	double x_centre, y_centre ;
+	double rotation_indirecte = -rotation ;
+	Point *p_tmp ;
+	Point *centreDeRotation ;
+	Point *centreArriere ;
+	Polygone *next_poly ;
+
+	// récupérer le centre de rotation
+	// on veut un centre sur la ligne médiane avant/arrière du bus, mais plus ou
+	// moins en avant en fonction de la pondération CENTRE_ROTATION_PONDERATION
+	coef_avant = (bus->poly->a[0]->p1->x + bus->poly->a[1]->p1->x) / 2;
+	coef_arriere = (bus->poly->a[2]->p1->x + bus->poly->a[3]->p1->x) / 2;
+	x_centre = coef_avant * CENTRE_ROTATION_PONDERATION + coef_arriere * (1 - CENTRE_ROTATION_PONDERATION) ;
+
+	coef_avant = (bus->poly->a[0]->p1->y + bus->poly->a[1]->p1->y) / 2;
+	coef_arriere = (bus->poly->a[2]->p1->y + bus->poly->a[3]->p1->y) / 2;
+	y_centre = coef_avant * CENTRE_ROTATION_PONDERATION + coef_arriere * (1 - CENTRE_ROTATION_PONDERATION) ;
+
+	centreArriere = creerPointXY(x_centre, y_centre) ;
+
+	// créer un polygone ayant effectué la rotation
+	next_poly = creerPolygone(bus->poly->n, getSommetsPoly(bus->poly)) ;
+	rotationPolygone(next_poly, rotation_indirecte, centreArriere) ;
+
+	// si la rotation n'entre pas en collision avec le décord
+	for(i = 0 ; i < m->nb_poly ; i++) {
+		if(polygoneInPolygone(next_poly, m->poly[i])) {
+			collision = true ;
+		}
+	}
+	// alors faire la rotation pour le bus
+	if(!collision) {
+		// on fait tourner son polynome
+		rotationPolygone(bus->poly, rotation_indirecte, centreArriere) ;
+		// on récupère la nouvelle position
+		p_tmp = creerPointXY(bus->pos->x, bus->pos->y) ;
+		rotationPoint(p_tmp, rotation_indirecte, centreArriere) ;
+		bus->pos->x = p_tmp->x ;
+		bus->pos->y = p_tmp->y ;
+		bus->pos->w = bus->image->w ;
+		bus->pos->h = bus->image->h ;
+		// on met à jour la rotation
+		bus->rot += rotation ;
+		return true ; // SUCCESS
+	// sinon ne rien faire
+	} else {
+		return false ; // ECHEC
+	}
+}
 void afficherBus(SDL_Surface *ecran, Map *m, Bus *bus) {
 	int i ;
 	int x, y ;
