@@ -1,0 +1,34 @@
+
+Quantité de CO2 pour les bus de Toulouse de Tisseo
+durée de vie d'un bus : 30 ans
+(unité : kTCO2)
+bus diesel : (nb : 329)
+	\_ construction : 19.6
+	\_ energie de traction : 138.2
+	\_ maintenance : 17.2
+	\_ total sur 30 ans : 175
+	\_ total : 57575
+bus hybride : (nb : 25)
+	\_ construction : 23.3
+	\_ energie de traction : 65.9
+	\_ maintenance : 18.1
+	\_ total sur 30 ans : 108.3
+	\_ total : 2707.5
+bus électrique : (nb : 10)
+	\_ construction : 27.3
+	\_ energie de traction : 47.8
+	\_ maintenance : 18.5
+	\_ total sur 30 ans : 93.6
+	\_ total : 936
+
+Total de la consommation de tous les bus actuel annuel :
+57575 + 2707.5 + 936 / 30 = 2040.6
+
+La ligne L1 est la plus utilisée.
+Elle possède tous le bus électriques de Tisseo.
+Il y a 32 bus en moyenne sur la ligne L1.
+	\_ 10 bus éléctrique (936)
+	\_ 12 hybrides (1299.6)
+	\_ 10 diesel (1750)
+Total de la consommation sur la ligne L1 annuel :
+936 + 1299.6 + 1750 / 30 = 132.8
